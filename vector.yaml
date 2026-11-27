@@ -1,0 +1,37 @@
+data_dir: /var/lib/vector
+
+sources:
+  docker:
+    type: docker_logs
+    auto_partial_merge: true
+    include_containers:
+      - api-gateway
+      - security
+      - uploader
+      - minio
+      - elasticsearch
+      - kibana
+
+transforms:
+  normalize_docker_labels:
+    type: remap
+    inputs:
+      - docker
+    source: |
+      if exists(.label) {
+        .docker_labels = encode_json(.label)
+        del(.label)
+      }
+
+sinks:
+  elasticsearch:
+    type: elasticsearch
+    inputs:
+      - normalize_docker_labels
+    endpoints:
+      - http://elasticsearch:9200
+    mode: bulk
+    bulk:
+      index: "api-logs-%Y.%m.%d"
+    healthcheck:
+      enabled: true
