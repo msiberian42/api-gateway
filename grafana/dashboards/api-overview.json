@@ -1,0 +1,60 @@
+{
+  "annotations": { "list": [] },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": null,
+  "links": [],
+  "panels": [
+    {
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "reqps" }, "overrides": [] },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 },
+      "id": 1,
+      "options": { "legend": { "displayMode": "list", "placement": "bottom" }, "tooltip": { "mode": "single" } },
+      "targets": [{ "expr": "sum by (handler) (rate(http_requests_total{job=~\"security|uploader\"}[5m]))", "legendFormat": "{{handler}}", "refId": "A" }],
+      "title": "API requests per second",
+      "type": "timeseries"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "s" }, "overrides": [] },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 },
+      "id": 2,
+      "options": { "legend": { "displayMode": "list", "placement": "bottom" }, "tooltip": { "mode": "single" } },
+      "targets": [{ "expr": "sum by (handler) (rate(http_request_duration_seconds_sum{job=~\"security|uploader\"}[5m])) / clamp_min(sum by (handler) (rate(http_request_duration_seconds_count{job=~\"security|uploader\"}[5m])), 1e-9)", "legendFormat": "{{handler}}", "refId": "A" }],
+      "title": "Average API request duration",
+      "type": "timeseries"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "short" }, "overrides": [] },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 8 },
+      "id": 3,
+      "options": { "legend": { "displayMode": "list", "placement": "bottom" }, "tooltip": { "mode": "single" } },
+      "targets": [{ "expr": "sum by (status) (rate(http_requests_total{job=~\"security|uploader\", status=~\"5..\"}[5m]))", "legendFormat": "HTTP {{status}}", "refId": "A" }],
+      "title": "API server errors per second",
+      "type": "timeseries"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "bytes" }, "overrides": [] },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 8 },
+      "id": 4,
+      "options": { "legend": { "displayMode": "list", "placement": "bottom" }, "tooltip": { "mode": "single" } },
+      "targets": [{ "expr": "minio_cluster_capacity_usable_total_bytes - minio_cluster_capacity_usable_free_bytes", "legendFormat": "Used storage", "refId": "A" }, { "expr": "minio_cluster_capacity_usable_free_bytes", "legendFormat": "Free storage", "refId": "B" }],
+      "title": "MinIO cluster storage",
+      "type": "timeseries"
+    }
+  ],
+  "refresh": "30s",
+  "schemaVersion": 39,
+  "tags": ["api", "prometheus"],
+  "templating": { "list": [] },
+  "time": { "from": "now-1h", "to": "now" },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "API Overview",
+  "uid": "api-overview",
+  "version": 1
+}
